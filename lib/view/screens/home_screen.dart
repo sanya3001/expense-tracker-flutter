@@ -74,15 +74,15 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF5E4BFF), Color(0xFF8675FF)],
+          colors: [Colors.green, Colors.greenAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF5E4BFF).withOpacity(0.3),
-            blurRadius: 10,
+            color: Colors.lightGreenAccent,
+            blurRadius: 12,
             offset: const Offset(0, 5),
           )
         ],
