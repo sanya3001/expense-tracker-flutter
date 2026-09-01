@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../utils/app_colors.dart';
@@ -10,34 +11,114 @@ class SignupScreen extends StatefulWidget {
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
+// class _SignupScreenState extends State<SignupScreen> {
+//   final TextEditingController _nameController = TextEditingController();
+//   final TextEditingController _emailController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+//   final AuthService _authService = AuthService();
+//
+//   bool _obscurePassword = true;
+//   bool _isLoading = false;
+//
+//   void _handleSignup() async {
+//     setState(() => _isLoading = true);
+//     final user = await _authService.loginWithEmail(
+//       _emailController.text.trim(),
+//       _passwordController.text.trim(),
+//     );
+//     setState(() => _isLoading = false);
+//
+//     if (user != null && mounted) {
+//       // Ideally, update user profile with Name here
+//       Navigator.pushAndRemoveUntil(
+//         context,
+//         MaterialPageRoute(builder: (context) => const HomeScreen()),
+//             (Route<dynamic> route) => false,
+//       );
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text("Signup Failed. Please try again.")),
+//       );
+//     }
+//   }
+
 class _SignupScreenState extends State<SignupScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+
+  final TextEditingController _nameController =
+  TextEditingController();
+
+  final TextEditingController _emailController =
+  TextEditingController();
+
+  final TextEditingController _passwordController =
+  TextEditingController();
+
+  //authservice object
   final AuthService _authService = AuthService();
 
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  void _handleSignup() async {
-    setState(() => _isLoading = true);
-    final user = await _authService.loginWithEmail(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    );
-    setState(() => _isLoading = false);
+  // Create Account
+  Future<void> _handleSignup() async {
 
-    if (user != null && mounted) {
-      // Ideally, update user profile with Name here
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (Route<dynamic> route) => false,
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final User? user = await _authService.createAccountWithEmail(
+        _emailController.text.trim(), //trim extra space ne remove kare
+        _passwordController.text.trim(),
       );
-    } else {
+
+      //check kare user create thyo k nai and screen widget tree ma che k nai
+      if (user != null && mounted) {
+        //user back no jai shake
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+              (route) => false,
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = 'Account creation failed';
+
+      if (e.code == 'email-already-in-use') {
+        message =
+        'An account already exists with this email';
+      } else if (e.code == 'invalid-email') {
+        message = 'Please enter a valid email address';
+      } else if (e.code == 'weak-password') {
+        message = 'Password is too weak';
+      }
+
+      if (!mounted) return;
+
+      //temporary message batave
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Signup Failed. Please try again.")),
+        SnackBar(
+          content: Text(message),
+        ),
       );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Something went wrong. Please try again.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
