@@ -1,0 +1,134 @@
+{
+  "project_info": {
+    "project_number": "96198658949",
+    "project_id": "todolist-380af",
+    "storage_bucket": "todolist-380af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96198658949:android:02968f9aa48ab0eb6552ec",
+        "android_client_info": {
+          "package_name": "com.example.expense_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "96198658949-uffp8894de8addrhcks9htiim5k9vh7f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.expense_tracker",
+            "certificate_hash": "c8bd0a7627fb441e3b5739af4b76522ab9f4c7f0"
+          }
+        },
+        {
+          "client_id": "96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrzpfSmvvu71DI9f9vReiT0rZn26ivjvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "96198658949-csu1rsl8cg3am46f0tpmvgnscgq8jh3t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.expenseTracker"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96198658949:android:7ab3233eaa84b86f6552ec",
+        "android_client_info": {
+          "package_name": "com.example.expense_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrzpfSmvvu71DI9f9vReiT0rZn26ivjvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "96198658949-csu1rsl8cg3am46f0tpmvgnscgq8jh3t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.expenseTracker"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96198658949:android:bc601bac2a8749b76552ec",
+        "android_client_info": {
+          "package_name": "com.nexowa.todolist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "96198658949-cuijec99hm86gfvcgufokhbcs4t2ammg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nexowa.todolist",
+            "certificate_hash": "c8bd0a7627fb441e3b5739af4b76522ab9f4c7f0"
+          }
+        },
+        {
+          "client_id": "96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrzpfSmvvu71DI9f9vReiT0rZn26ivjvw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "96198658949-csu1rsl8cg3am46f0tpmvgnscgq8jh3t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.expenseTracker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
