@@ -21,7 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildHeader(),
               const SizedBox(height: 24),
               _buildBalanceCard(),
-              //   const SizedBox(height: 24),
+              const SizedBox(height: 24),
+              _buildHeader(),
+              const SizedBox(height: 24),
+              _buildBalanceCard(),
+              const SizedBox(height: 24),
               //   _buildMonthSummary(),
               //   const SizedBox(height: 24),
               //   _buildSpendingOverview(),
@@ -43,23 +47,27 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              "Good Morning, Sanya 👋",
+              "Good Morning, Nexowa 👋",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             SizedBox(height: 4),
             Text(
               "Here's your family overview",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: Colors.blue),
+            ),
+            Text(
+              "Here's your company overview",
+              style: TextStyle(fontSize: 14, color: Colors.red),
             ),
           ],
         ),
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            color: Colors.greenAccent,
+            borderRadius: BorderRadius.circular(12),
             boxShadow: [
-              BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)
+              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)
             ],
           ),
           child: const Icon(Icons.tune, color: Colors.black87),
@@ -71,17 +79,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBalanceCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Colors.green, Colors.greenAccent],
+          colors: [Colors.red, Colors.pinkAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.lightGreenAccent,
+            color: Colors.lightBlueAccent,
             blurRadius: 12,
             offset: const Offset(0, 5),
           )
@@ -99,9 +107,14 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 8),
               const Text(
                 "₹ 45,230.50",
-                style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.red, fontSize: 32, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
+              const Text(
+                "₹ 56,890.60",
+                style: TextStyle(color: Colors.pink, fontSize: 32, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   const Icon(Icons.arrow_upward, color: Colors.greenAccent, size: 16),
@@ -118,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             right: 0,
             top: 10,
-            child: Icon(Icons.account_balance_wallet, color: Colors.white.withOpacity(0.5), size: 60),
+            child: Icon(Icons.account_balance_wallet, color: Colors.yellow.withOpacity(0.5), size: 60),
           ),
         ],
       ),
