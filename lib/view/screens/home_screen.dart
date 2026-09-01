@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../services/auth_service.dart';
 import '../../utils/app_colors.dart';
 import 'login_screen.dart';
@@ -32,6 +31,16 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
               // _buildRecentTransactions(),
               // const SizedBox(height: 30), // Bottom scroll space
+              const SizedBox(height: 24),
+              _buildHeader(),
+              const SizedBox(height: 24),
+              _buildBalanceCard(),
+              const SizedBox(height: 24),
+              //   _buildMonthSummary(),
+              //   const SizedBox(height: 24),
+              //   _buildSpendingOverview(),
+              //   const SizedBox(height: 24),
+              //   _buildRecentTransactions(),
             ],
           ),
         ),
@@ -57,8 +66,24 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text("Good Morning 👋", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textMain)), SizedBox(height: 4), Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
-        // Logout Button for testing
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              "Good Morning, Nexowa 👋",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+            ),
+            SizedBox(height: 4),
+            Text(
+              "Here's your family overview",
+              style: TextStyle(fontSize: 14, color: Colors.blue),
+            ),
+            Text(
+              "Here's your company overview",
+              style: TextStyle(fontSize: 14, color: Colors.red),
+            ),
+          ],
+        ),        // Logout Button for testing
         GestureDetector(
           onTap: () async {
             await AuthService().logout();
@@ -69,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: Colors.greenAccent,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -91,7 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(gradient: const LinearGradient(colors: [AppColors.primaryDark, AppColors.primaryLight], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))]),
+      decoration: BoxDecoration(
+          gradient: const LinearGradient(
+              colors: [Colors.red, Colors.pinkAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight),
+          borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))]),
       child: Stack(
         children: [
           Column(
@@ -107,6 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               const Text("₹ 45,230.50", style: TextStyle(color: AppColors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+              const Text(
+                "₹ 56,890.60",
+                style: TextStyle(color: Colors.pink, fontSize: 32, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
