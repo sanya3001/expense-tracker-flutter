@@ -34,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,11 +73,11 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF5E4BFF), Color(0xFF8675FF)],
+          colors: [Colors.deepPurpleAccent, Colors.purpleAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF5E4BFF).withOpacity(0.3),
