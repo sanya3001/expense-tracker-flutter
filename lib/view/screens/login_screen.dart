@@ -21,26 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
   bool _isLoading = false;
 
-  // void _handleLogin() async {
-  //   setState(() => _isLoading = true);
-  //   final user = await _authService.loginWithEmail(
-  //     _emailController.text.trim(),
-  //     _passwordController.text.trim(),
-  //   );
-  //   setState(() => _isLoading = false);
-  //
-  //   if (user != null && mounted) {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
-  //     );
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text("Login Failed. Please check credentials.")),
-  //     );
-  //   }
-  // }
-
   Future<void> _handleLogin() async {
 
     setState(() {
@@ -100,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
   void _handleGoogleLogin() async {
     setState(() => _isLoading = true);
     final user = await _authService.loginWithGoogle();
@@ -113,8 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
