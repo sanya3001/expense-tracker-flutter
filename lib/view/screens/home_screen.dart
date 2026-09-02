@@ -4,11 +4,11 @@ import '../../utils/app_colors.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+   const HomeScreen({Key? key}) : super(key: key);
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+   @override
+   State<HomeScreen> createState() => _HomeScreenState();
+ }
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
@@ -22,8 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 25),
               _buildBalanceCard(),
+              const SizedBox(height: 28),
               const SizedBox(height: 24),
               _buildMonthSummary(),
               const SizedBox(height: 24),
@@ -33,9 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
               // const SizedBox(height: 30), // Bottom scroll space
               const SizedBox(height: 24),
               _buildHeader(),
-              const SizedBox(height: 24),
-              _buildBalanceCard(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 26),
+
               //   _buildMonthSummary(),
               //   const SizedBox(height: 24),
               //   _buildSpendingOverview(),
@@ -70,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              "Good Morning, Nexowa 👋",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+              "Hello Sanya! Welcome to Home",
+              style: TextStyle(fontSize: 18, color: Colors.black87),
             ),
             SizedBox(height: 4),
             Text(
@@ -83,7 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontSize: 14, color: Colors.red),
             ),
           ],
-        ),        // Logout Button for testing
+        ),
+        // Logout Button for testing
         GestureDetector(
           onTap: () async {
             await AuthService().logout();
@@ -92,20 +93,16 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           },
           child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.greenAccent,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0x0D000000), // 5% opacity black
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: const Icon(Icons.logout, color: AppColors.expenseText, size: 20),
-          ),
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+    color: Colors.pinkAccent,
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+    BoxShadow(color: Colors.green.withOpacity(0.1), blurRadius: 8)
+    ],
+    ),
+    child: const Icon(Icons.tune, color: Colors.black87),
+    ),
         ),
       ],
     );
@@ -117,11 +114,20 @@ class _HomeScreenState extends State<HomeScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-          gradient: const LinearGradient(
-              colors: [Colors.red, Colors.pinkAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight),
-          borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))]),
+        gradient: const LinearGradient(
+          colors: [Colors.yellow, Colors.pinkAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.lightBlueAccent,
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          )
+        ],
+      ),
+
       child: Stack(
         children: [
           Column(
@@ -136,28 +142,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text("₹ 45,230.50", style: TextStyle(color: AppColors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+              const Text(
+                "₹ 45,230.50",
+                style: TextStyle(color: Colors.red, fontSize: 32, fontWeight: FontWeight.bold),
+              ),
               const Text(
                 "₹ 56,890.60",
                 style: TextStyle(color: Colors.pink, fontSize: 32, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: AppColors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.arrow_upward, color: Color(0xFF4CAF50), size: 14), // Green Accent
-                    SizedBox(width: 4),
-                    Text("12.5% vs last month", style: TextStyle(color: AppColors.white, fontSize: 12)),
-                  ],
-                ),
+
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.arrow_upward, color: Colors.greenAccent, size: 16),
+                  const SizedBox(width: 4),
+                  const Text(
+                    "12.5% vs last month",
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
               ),
             ],
           ),
           // Background Wallet Icon
-          Positioned(right: -10, top: 10, child: Icon(Icons.account_balance_wallet, color: AppColors.white.withOpacity(0.15), size: 80)),
+          Positioned(
+            right: 0,
+            top: 10,
+            child: Icon(Icons.account_balance_wallet, color: Colors.yellow.withOpacity(0.5), size: 60),
+          ),
         ],
       ),
     );
