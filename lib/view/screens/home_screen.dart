@@ -19,13 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 25),
               _buildBalanceCard(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               _buildHeader(),
-              const SizedBox(height: 24),
-              _buildBalanceCard(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 26),
+
               //   _buildMonthSummary(),
               //   const SizedBox(height: 24),
               //   _buildSpendingOverview(),
@@ -38,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -47,27 +45,23 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              "Good Morning, Nexowa 👋",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+              "Hello Sanya! Welcome to Home",
+              style: TextStyle(fontSize: 18, color: Colors.black87),
             ),
             SizedBox(height: 4),
             Text(
               "Here's your family overview",
               style: TextStyle(fontSize: 14, color: Colors.blue),
             ),
-            Text(
-              "Here's your company overview",
-              style: TextStyle(fontSize: 14, color: Colors.red),
-            ),
           ],
         ),
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.greenAccent,
+            color: Colors.pinkAccent,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)
+              BoxShadow(color: Colors.green.withOpacity(0.1), blurRadius: 8)
             ],
           ),
           child: const Icon(Icons.tune, color: Colors.black87),
@@ -82,11 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Colors.red, Colors.pinkAccent],
+          colors: [Colors.yellow, Colors.pinkAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.lightBlueAccent,
@@ -110,11 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(color: Colors.red, fontSize: 32, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "₹ 56,890.60",
-                style: TextStyle(color: Colors.pink, fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
               Row(
                 children: [
                   const Icon(Icons.arrow_upward, color: Colors.greenAccent, size: 16),
