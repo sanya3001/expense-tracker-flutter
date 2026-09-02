@@ -1,8 +1,13 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/category_model.dart';
+import '../../models/transaction_model.dart';
+import '../../providers/expense_provider.dart';
 import '../../services/auth_service.dart';
 import '../../utils/app_colors.dart';
 import 'login_screen.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,8 +17,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  final List<CategoryModel> categories = [
+  CategoryModel(name: "Home", percentage: "35%", color: AppColors.catHome),
+  CategoryModel(name: "Food", percentage: "25%", color: AppColors.catFood),
+  CategoryModel(name: "Transport", percentage: "15%", color: AppColors.catTransport),
+  CategoryModel(name: "Education", percentage: "15%", color: AppColors.catEducation),
+  CategoryModel(name: "Others", percentage: "10%", color: AppColors.catOthers),
+  ];
+
+  // final List<TransactionModel> recentTransactions = [
+  //   TransactionModel(
+  //     title: "Grocery Shopping",
+  //     date: DateTime.now(),
+  //     // Real app ma proper date hase
+  //     amount: 1250.00,
+  //     iconPath: "🛒",
+  //     category: "Food",
+  //   ),
+  //   TransactionModel(
+  //     title: "Electricity Bill",
+  //     date: DateTime.now().subtract(const Duration(days: 1)),
+  //     amount: 1800.00,
+  //     iconPath: "⚡",
+  //     category: "Home",
+  //   ),
+  // ];
+
   @override
   Widget build(BuildContext context) {
+    final expenseProvider = Provider.of<ExpenseProvider>(context);
     return Scaffold(
       backgroundColor: Color(0xFFF8F9FE),
       body: SafeArea(
@@ -28,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
               _buildMonthSummary(),
               const SizedBox(height: 24),
-              _buildSpendingOverview(),
+              _buildSpendingOverview(expenseProvider),
               const SizedBox(height: 24),
               // _buildRecentTransactions(),
               // const SizedBox(height: 30), // Bottom scroll space
@@ -150,9 +183,99 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 4. Spending Overview
-  Widget _buildSpendingOverview() {
-    return Container();
+  Widget _buildSpendingOverview(ExpenseProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Spending Overview", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textMain),),
+        const SizedBox(height: 16,),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [BoxShadow(
+                color: Color(0x05000000),
+                blurRadius: 10,
+                spreadRadius: 2,
+              )
+              ]
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 130,
+                height: 130,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    PieChart(
+                      PieChartData(
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 45,
+                        sections: categories.map((cat) {
+                          return PieChartSectionData(
+                            color: cat.color,
+                            value: double.parse(cat.percentage.replaceAll('%', '')),
+                            title: '',
+                            radius: 12,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "₹ ${provider.totalExpense.toStringAsFixed(0)}",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMain),
+                        ),
+                        const Text(
+                          "Total",
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24,),
+
+              // Custom Legend
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: categories.map((cat) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(backgroundColor: cat.color, radius: 5),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              cat.name,
+                              style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                            ),
+                          ),
+                          Text(
+                            cat.percentage,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMain),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              )
+            ],
+          ),
+        ),
+      ],
+    );
   }
+
+
 
   //5.
 

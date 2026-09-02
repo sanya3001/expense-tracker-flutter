@@ -20,6 +20,11 @@ class AppColors {
   static const Color textMain = Color(0xFF1E1E1E);
   static const Color textMuted = Color(0xFF757575);
 
-  //Category Colors
+  // Category Chart Colors
+  static const Color catHome = Color(0xFF4A3AFF);
+  static const Color catFood = Color(0xFFFFB74D);
+  static const Color catTransport = Color(0xFF29B6F6);
+  static const Color catEducation = Color(0xFFFF8A65);
+  static const Color catOthers = Color(0xFF66BB6A);
 
 }
