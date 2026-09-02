@@ -14,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white24,
+      backgroundColor: Colors.yellow,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildNavItem(Icons.home_filled, "Home", true),
               _buildNavItem(Icons.list_alt, "Transactions", false),
-              const SizedBox(width: 40), // Center FAB space
+              const SizedBox(width: 40),
               _buildNavItem(Icons.account_balance_wallet_outlined, "Budget", false),
               _buildNavItem(Icons.more_horiz, "More", false),
             ],
