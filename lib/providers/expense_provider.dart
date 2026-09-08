@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/models/transaction_model.dart';
 import 'package:flutter/material.dart';
 
@@ -8,11 +8,11 @@ class ExpenseProvider with ChangeNotifier {
 
   //total income calculate
   double get totalIncome {
-    return _transactions.where((tx) => tx.isIncome).fold(0.0, (sum, item) => sum + double.parse(item.amount));
+    return _transactions.where((tx) => tx.isIncome).fold(0.0, (sum, item) => sum + item.amount);
   }
 
   double get totalExpense {
-    return _transactions.where((tx) => !tx.isIncome).fold(0.0, (sum, item) => sum + double.parse(item.amount));
+    return _transactions.where((tx) => !tx.isIncome).fold(0.0, (sum, item) => sum + item.amount);
   }
 
   double get totalBalance {

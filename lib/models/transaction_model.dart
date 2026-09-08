@@ -1,10 +1,10 @@
 class TransactionModel{
   final String title;
-  final String date;
-  final String amount;
+  final DateTime date;
+  final double amount;
   final String iconPath;
   final bool isIncome;
-  final bool category;
+  final String category;
 
   TransactionModel({
     required this.title,

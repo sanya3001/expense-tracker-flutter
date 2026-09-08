@@ -1,3 +1,4 @@
+import 'package:expense_tracker/view/screens/add_expense_screen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -26,23 +27,23 @@ class _HomeScreenState extends State<HomeScreen> {
   CategoryModel(name: "Others", percentage: "10%", color: AppColors.catOthers),
   ];
 
-  // final List<TransactionModel> recentTransactions = [
-  //   TransactionModel(
-  //     title: "Grocery Shopping",
-  //     date: DateTime.now(),
-  //     // Real app ma proper date hase
-  //     amount: 1250.00,
-  //     iconPath: "🛒",
-  //     category: "Food",
-  //   ),
-  //   TransactionModel(
-  //     title: "Electricity Bill",
-  //     date: DateTime.now().subtract(const Duration(days: 1)),
-  //     amount: 1800.00,
-  //     iconPath: "⚡",
-  //     category: "Home",
-  //   ),
-  // ];
+  final List<TransactionModel> recentTransactions = [
+    TransactionModel(
+      title: "Grocery Shopping",
+      date: DateTime.now(),
+      // Real app ma proper date hase
+      amount: 1250.00,
+      iconPath: "🛒",
+      category: "Food",
+    ),
+    TransactionModel(
+      title: "Electricity Bill",
+      date: DateTime.now().subtract(const Duration(days: 1)),
+      amount: 1800.00,
+      iconPath: "⚡",
+      category: "Home",
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
               _buildSpendingOverview(expenseProvider),
               const SizedBox(height: 24),
-              // _buildRecentTransactions(),
-              // const SizedBox(height: 30), // Bottom scroll space
+              _buildRecentTransactions(),
+              const SizedBox(height: 30), // Bottom scroll space
             ],
           ),
         ),
@@ -74,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Add Expense code
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AddExpenseScreen()));
         },
         backgroundColor: AppColors.primary,
         shape: const CircleBorder(),
@@ -90,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text("Good Morning 👋", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textMain)), SizedBox(height: 4), Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text("Good Morning Sanya 👋", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textMain)), SizedBox(height: 4), Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
         // Logout Button for testing
         GestureDetector(
           onTap: () async {
@@ -194,7 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: const [BoxShadow(
+              boxShadow: const [
+                BoxShadow(
                 color: Color(0x05000000),
                 blurRadius: 10,
                 spreadRadius: 2,
@@ -275,9 +278,73 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  //5. Recent Transaction
+  Widget _buildRecentTransactions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            Text(
+              "Recent Transactions",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textMain),
+            ),
+            Icon(Icons.more_horiz, color: AppColors.textMuted),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: recentTransactions.length,
+          itemBuilder: (context, index) {
+            final tx = recentTransactions[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF000000).withOpacity(0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  )
+                ],
+              ),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.incomeBg, // Change based on category in real app
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(tx.iconPath, style: const TextStyle(fontSize: 22)),
+                ),
+                title: Text(
+                  tx.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textMain),
+                ),
+                subtitle: const Text(
+                  "Today, 08:30 AM", // Real app ma date format use karishu
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                ),
+                trailing: Text(
+                  "₹ ${tx.amount.toStringAsFixed(0)}",
+                    // ${provider.totalExpense.toStringAsFixed(0)}
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textMain),
+                ),
+              ),
+            );
+          },
+        )
+      ],
+    );
+  }
 
-
-  //5.
 
   // 6. Bottom Navigation Bar
   Widget _buildBottomNavigationBar() {
