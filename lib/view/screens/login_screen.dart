@@ -205,7 +205,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Social Login Buttons
               Row(
                 children: [
                   Expanded(
