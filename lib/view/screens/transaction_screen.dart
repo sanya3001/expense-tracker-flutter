@@ -20,7 +20,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<ExpenseProvider>(context);
 
-    // All Expenses / All Income (Past + Today badha transactions)
+    // All Expenses / All Income
     final List<TransactionModel> displayList =
     _showExpenses ? provider.expenseTransactions : provider.incomeTransactions;
 

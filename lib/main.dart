@@ -1,3 +1,4 @@
+import 'package:expense_tracker/providers/family_provider.dart';
 import 'package:expense_tracker/view/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,10 +18,14 @@ void main() async {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ExpenseProvider(),
+    MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ExpenseProvider()),
+          ChangeNotifierProvider(create: (_) => FamilyProvider()),
+
+    ],
       child: const FamilyExpenseApp(),
-    ),
+    )
   );
 }
 

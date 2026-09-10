@@ -1,3 +1,4 @@
+import 'package:expense_tracker/view/screens/family_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -19,13 +20,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<CategoryModel> categories = [
-    CategoryModel(name: "Home", percentage: "35%", color: AppColors.catHome),
-    CategoryModel(name: "Food", percentage: "25%", color: AppColors.catFood),
-    CategoryModel(name: "Transport", percentage: "15%", color: AppColors.catTransport),
-    CategoryModel(name: "Education", percentage: "15%", color: AppColors.catEducation),
-    CategoryModel(name: "Others", percentage: "10%", color: AppColors.catOthers),
-  ];
+  // final List<CategoryModel> categories = [
+  //   CategoryModel(name: "Home", percentage: "35%", color: AppColors.catHome),
+  //   CategoryModel(name: "Food", percentage: "25%", color: AppColors.catFood),
+  //   CategoryModel(name: "Transport", percentage: "15%", color: AppColors.catTransport),
+  //   CategoryModel(name: "Education", percentage: "15%", color: AppColors.catEducation),
+  //   CategoryModel(name: "Others", percentage: "10%", color: AppColors.catOthers),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSpendingOverview(ExpenseProvider provider) {
+    // Provider mathi dynamic category list (percentage sathe)
+    final List<CategoryModel> categories = provider.categorySpendingList;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -126,49 +130,54 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(20), boxShadow: const [BoxShadow(color: Color(0x05000000), blurRadius: 10, spreadRadius: 2)]),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 130,
-                height: 130,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    PieChart(
-                      PieChartData(
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 45,
-                        sections:
-                            categories.map((cat) {
-                              return PieChartSectionData(color: cat.color, value: double.parse(cat.percentage.replaceAll('%', '')), title: '', radius: 12);
-                            }).toList(),
+          child:
+              categories.isEmpty
+                  ? Container(width: double.infinity, padding: const EdgeInsets.symmetric(vertical: 24), alignment: Alignment.center, child: const Text("No expense data to analyze", style: TextStyle(color: AppColors.textMuted, fontSize: 13)))
+                  : Row(
+                    children: [
+                      SizedBox(
+                        width: 130,
+                        height: 130,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            PieChart(
+                              PieChartData(
+                                sectionsSpace: 2,
+                                centerSpaceRadius: 45,
+                                sections:
+                                    categories.map((cat) {
+                                      return PieChartSectionData(color: cat.color, value: double.parse(cat.percentage.replaceAll('%', '')), title: '', radius: 12);
+                                    }).toList(),
+                              ),
+                            ),
+                            Column(mainAxisSize: MainAxisSize.min, children: [Text("₹ ${provider.totalExpense.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMain)), const Text("Total", style: TextStyle(color: AppColors.textMuted, fontSize: 11))]),
+                          ],
+                        ),
                       ),
-                    ),
-                    Column(mainAxisSize: MainAxisSize.min, children: [Text("₹ ${provider.totalExpense.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMain)), const Text("Total", style: TextStyle(color: AppColors.textMuted, fontSize: 11))]),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      categories.map((cat) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 10.0),
-                          child: Row(children: [CircleAvatar(backgroundColor: cat.color, radius: 5), const SizedBox(width: 10), Expanded(child: Text(cat.name, style: const TextStyle(fontSize: 13, color: AppColors.textMuted))), Text(cat.percentage, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMain))]),
-                        );
-                      }).toList(),
-                ),
-              ),
-            ],
-          ),
+                      const SizedBox(width: 24),
+
+                      // Dynamic Legend
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children:
+                              categories.map((cat) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Row(children: [CircleAvatar(backgroundColor: cat.color, radius: 5), const SizedBox(width: 10), Expanded(child: Text(cat.name, style: const TextStyle(fontSize: 13, color: AppColors.textMuted))), Text(cat.percentage, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMain))]),
+                                );
+                              }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ],
     );
   }
 
-  // Home Screen: Today Expense batavse
+  // Home Screen: Today Expense
   Widget _buildRecentTransactions(ExpenseProvider provider) {
     final todayExpenses = provider.todayExpenseTransactions;
 
@@ -228,13 +237,19 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded( child: _buildNavItem(Icons.home_filled, "Home", true, () {})),
-              Expanded(child: _buildNavItem(Icons.list_alt, "History", false, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const TransactionsScreen()));
-              })),
+              Expanded(child: _buildNavItem(Icons.home_filled, "Home", true, () {})),
+              Expanded(
+                child: _buildNavItem(Icons.list_alt, "History", false, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const TransactionsScreen()));
+                }),
+              ),
               const SizedBox(width: 48),
-              Expanded( child: _buildNavItem(Icons.account_balance_wallet_outlined, "Budget", false, () {})),
-              Expanded( child: _buildNavItem(Icons.more_horiz, "More", false, () {})),
+              Expanded(
+                child: _buildNavItem(Icons.group_outlined, "Family", false, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const FamilyScreen()));
+                }),
+              ),
+              Expanded(child: _buildNavItem(Icons.more_horiz, "More", false, () {})),
             ],
           ),
         ),
@@ -246,7 +261,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return MaterialButton(
       minWidth: 40,
       onPressed: onTap,
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, color: isActive ? AppColors.primary : AppColors.textMuted, size: 26), const SizedBox(height: 4), FittedBox(fit: BoxFit.scaleDown,child: Text(label,maxLines: 1, style: TextStyle(fontSize: 10, color: isActive ? AppColors.primary : AppColors.textMuted, fontWeight: isActive ? FontWeight.w600 : FontWeight.normal)))]),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Icon(icon, color: isActive ? AppColors.primary : AppColors.textMuted, size: 26), const SizedBox(height: 4), FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: TextStyle(fontSize: 10, color: isActive ? AppColors.primary : AppColors.textMuted, fontWeight: isActive ? FontWeight.w600 : FontWeight.normal)))],
+      ),
     );
   }
 }
