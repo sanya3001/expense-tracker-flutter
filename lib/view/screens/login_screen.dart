@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/expense_provider.dart';
+import '../../providers/family_provider.dart';
 import '../../services/auth_service.dart';
 import '../../utils/app_colors.dart';
 import 'home_screen.dart';
@@ -22,23 +26,26 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _handleLogin() async {
-
     setState(() {
       _isLoading = true;
     });
 
     try {
       final User? user = await _authService.loginWithEmail(
-            _emailController.text.trim(),
-            _passwordController.text.trim(),
-          );
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
 
       if (user != null && mounted) {
-        Navigator.pushReplacement(
+        // user object pass karine family data sync karvo
+        await Provider.of<FamilyProvider>(context, listen: false).initFamily(user);
+        await Provider.of<ExpenseProvider>(context, listen: false).initFamilyAndFetch(user);
+
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -57,18 +64,14 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
+        SnackBar(content: Text(message)),
       );
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Something went wrong. Please try again.',
-          ),
+          content: Text('Something went wrong. Please try again.'),
         ),
       );
     } finally {
@@ -83,13 +86,23 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleGoogleLogin() async {
     setState(() => _isLoading = true);
     final user = await _authService.loginWithGoogle();
-    setState(() => _isLoading = false);
 
     if (user != null && mounted) {
-      Navigator.pushReplacement(
+      // user object pass karine Google login ma b sync karvo
+      await Provider.of<FamilyProvider>(context, listen: false).initFamily(user);
+      await Provider.of<ExpenseProvider>(context, listen: false).initFamilyAndFetch(user);
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false,
       );
+    } else {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -104,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              // Illustration
               Image.asset(
                 'assets/images/home.png',
                 height: 180,
@@ -115,7 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-
               const Text(
                 "Welcome Back!",
                 style: TextStyle(
@@ -131,15 +142,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Email Field
               _buildTextField(
                 controller: _emailController,
                 hintText: "Email or Phone",
-                icon: Icons.lock_outline,
+                icon: Icons.email_outlined,
               ),
               const SizedBox(height: 16),
 
-              // Password Field
               _buildTextField(
                 controller: _passwordController,
                 hintText: "Password",
@@ -148,7 +157,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Remember Me & Forgot Password
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -174,7 +182,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Login Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -192,7 +199,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Or Continue With Divider
               Row(
                 children: const [
                   Expanded(child: Divider(color: Color(0xFFE0E0E0), thickness: 1)),
@@ -226,7 +232,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Sign Up Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -248,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
-    bool isPassword = false
+    bool isPassword = false,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -288,7 +293,7 @@ class _LoginScreenState extends State<LoginScreen> {
           border: Border.all(color: const Color(0xFFE0E0E0)),
         ),
         child: Center(
-          child: Icon(fallbackIcon, size: 30, color: AppColors.textMain), // Replace with Image.asset for real icons
+          child: Icon(fallbackIcon, size: 30, color: AppColors.textMain),
         ),
       ),
     );

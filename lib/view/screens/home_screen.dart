@@ -6,10 +6,12 @@ import 'package:fl_chart/fl_chart.dart';
 
 import '../../models/category_model.dart';
 import '../../providers/expense_provider.dart';
+import '../../providers/family_provider.dart';
 import '../../services/auth_service.dart';
 import '../../utils/app_colors.dart';
 import 'add_expense_screen.dart';
 import 'login_screen.dart';
+import 'more_screen.dart';
 import 'transaction_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -58,12 +60,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text("Good Morning 👋", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textMain)), SizedBox(height: 4), Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text("Good Morning, Sanya! 👋", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textMain)), SizedBox(height: 4), Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
         GestureDetector(
           onTap: () async {
+            Provider.of<ExpenseProvider>(context, listen: false).clearData();
+            Provider.of<FamilyProvider>(context, listen: false).clearData();
             await AuthService().logout();
             if (context.mounted) {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginScreen()), (route) => false);
             }
           },
           child: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Color(0x0D000000), blurRadius: 10, spreadRadius: 1)]), child: const Icon(Icons.logout, color: AppColors.expenseText, size: 20)),
@@ -249,7 +253,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const FamilyScreen()));
                 }),
               ),
-              Expanded(child: _buildNavItem(Icons.more_horiz, "More", false, () {})),
+              Expanded(
+                child: _buildNavItem(Icons.more_horiz, "More", false, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MoreScreen()));
+                }),
+              ),
             ],
           ),
         ),

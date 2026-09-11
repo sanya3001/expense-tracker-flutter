@@ -1,3 +1,4 @@
+import 'package:expense_tracker/view/screens/add_family_member_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/family_provider.dart';
@@ -60,7 +61,7 @@ class FamilyScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const FamilyScreen()),
+                MaterialPageRoute(builder: (context) => const AddFamilyMemberScreen()),
               );
             },
           )
@@ -79,7 +80,7 @@ class FamilyScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const FamilyScreen()),
+                      builder: (context) => const AddFamilyMemberScreen()),
                 );
               },
               icon: const Icon(Icons.add, color: Colors.white),

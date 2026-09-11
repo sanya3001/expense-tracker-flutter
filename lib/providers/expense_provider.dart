@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../models/transaction_model.dart';
@@ -6,21 +7,28 @@ import '../utils/app_colors.dart';
 
 class ExpenseProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   List<TransactionModel> _transactions = [];
+  String? _familyId;
 
   ExpenseProvider() {
-    fetchTransactions();
+    _auth.authStateChanges().listen((user) {
+      if (user != null) {
+        initFamilyAndFetch(user);
+      } else {
+        clearData();
+      }
+    });
   }
 
   List<TransactionModel> get transactions => _transactions;
+  String? get familyId => _familyId;
 
-  // Transactions Screen mate: All Expenses
   List<TransactionModel> get expenseTransactions => _transactions.where((tx) => !tx.isIncome).toList();
 
-  // Transactions Screen mate: All Income
   List<TransactionModel> get incomeTransactions => _transactions.where((tx) => tx.isIncome).toList();
 
-  // Home Screen mate: Today expenses
   List<TransactionModel> get todayExpenseTransactions {
     final now = DateTime.now();
     return _transactions.where((tx) {
@@ -28,79 +36,102 @@ class ExpenseProvider with ChangeNotifier {
     }).toList();
   }
 
-  // Calculation properties
-  double get totalIncome {
-    return _transactions.where((tx) => tx.isIncome).fold(0.0, (sum, item) => sum + item.amount);
-  }
+  double get totalIncome => _transactions.where((tx) => tx.isIncome).fold(0.0, (sum, item) => sum + item.amount);
 
-  double get totalExpense {
-    return _transactions.where((tx) => !tx.isIncome).fold(0.0, (sum, item) => sum + item.amount);
-  }
+  double get totalExpense => _transactions.where((tx) => !tx.isIncome).fold(0.0, (sum, item) => sum + item.amount);
 
   double get totalBalance => totalIncome - totalExpense;
 
-  // Dynamic Spending Overview Categories
   List<CategoryModel> get categorySpendingList {
     final expenses = expenseTransactions;
     final total = totalExpense;
 
-    if (total == 0 || expenses.isEmpty) {
-      return [];
-    }
+    if (total == 0 || expenses.isEmpty) return [];
 
-    // Category colors mapping
-    final Map<String, Color> categoryColors = {
-      'Home': AppColors.catHome,
-      'Food': AppColors.catFood,
-      'Transport': AppColors.catTransport,
-      'Education': AppColors.catEducation,
-      'Health': Colors.pinkAccent,
-      'Shopping': Colors.purpleAccent,
-      'Bills': Colors.cyan,
-      'Others': AppColors.catOthers,
-    };
+    final Map<String, Color> categoryColors = {'Home': AppColors.catHome, 'Food': AppColors.catFood, 'Transport': AppColors.catTransport, 'Education': AppColors.catEducation, 'Health': Colors.pinkAccent, 'Shopping': Colors.purpleAccent, 'Bills': Colors.cyan, 'Others': AppColors.catOthers};
 
-    // Category wise amount no sarvalo
     Map<String, double> categorySums = {};
     for (var tx in expenses) {
       categorySums[tx.category] = (categorySums[tx.category] ?? 0.0) + tx.amount;
     }
 
-    // Percentage calculate karvu
     List<CategoryModel> list = [];
     categorySums.forEach((categoryName, amount) {
       double pct = (amount / total) * 100;
-      list.add(CategoryModel(
-        name: categoryName,
-        percentage: "${pct.toStringAsFixed(1)}%",
-        color: categoryColors[categoryName] ?? AppColors.catOthers,
-      ));
+      list.add(CategoryModel(name: categoryName, percentage: "${pct.toStringAsFixed(1)}%", color: categoryColors[categoryName] ?? AppColors.catOthers));
     });
 
-    // Moto kharch upar aave te mate sort karvu
-    list.sort((a, b) {
-      double pctA = double.parse(a.percentage.replaceAll('%', ''));
-      double pctB = double.parse(b.percentage.replaceAll('%', ''));
-      return pctB.compareTo(pctA);
-    });
+    list.sort((a, b) => double.parse(b.percentage.replaceAll('%', '')).compareTo(double.parse(a.percentage.replaceAll('%', ''))));
 
     return list;
   }
 
+  // 1. login user ni familyId find karvi
+  Future<void> initFamilyAndFetch(User user) async {
+    try {
+      final userEmail = (user.email ?? '').trim().toLowerCase();
 
-  void fetchTransactions() {
-    _firestore.collection('transactions').orderBy('date', descending: true).snapshots().listen((snapshot) {
-      _transactions = snapshot.docs.map((doc) => TransactionModel.fromMap(doc.data(), doc.id)).toList();
-      notifyListeners();
-    });
+      final inviteQuery = await _firestore.collection('family_members').where('email', isEqualTo: userEmail).limit(1).get();
+
+      if (inviteQuery.docs.isNotEmpty) {
+        _familyId = inviteQuery.docs.first.data()['familyId'];
+      } else {
+        _familyId = user.uid;
+      }
+
+      fetchTransactions();
+    } catch (e) {
+      debugPrint("Error finding familyId in expense provider: $e");
+      _familyId = user.uid;
+      fetchTransactions();
+    }
   }
 
-  // Firestore ma save karva
+  void fetchTransactions() {
+    if (_familyId == null) {
+      _transactions = [];
+      notifyListeners();
+      return;
+    }
+
+    _firestore
+        .collection('transactions')
+        .where('familyId', isEqualTo: _familyId)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            _transactions = snapshot.docs.map((doc) => TransactionModel.fromMap(doc.data(), doc.id)).toList();
+
+            _transactions.sort((a, b) => b.date.compareTo(a.date));
+            notifyListeners();
+          },
+          onError: (error) {
+            debugPrint("Expense fetch error: $error");
+          },
+        );
+  }
+
   Future<void> addTransaction(TransactionModel transaction) async {
+    final user = _auth.currentUser;
+    if (_familyId == null && user != null) {
+      await initFamilyAndFetch(user);
+    }
+
+    if (_familyId == null) return;
+
     try {
-      await _firestore.collection('transactions').add(transaction.toMap());
+      final data = transaction.toMap();
+      data['familyId'] = _familyId;
+
+      await _firestore.collection('transactions').add(data);
     } catch (e) {
       debugPrint("Error saving transaction: $e");
     }
+  }
+
+  void clearData() {
+    _transactions = [];
+    _familyId = null;
+    notifyListeners();
   }
 }
