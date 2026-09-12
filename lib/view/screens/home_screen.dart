@@ -1,4 +1,5 @@
 import 'package:expense_tracker/view/screens/family_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -22,18 +23,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // final List<CategoryModel> categories = [
-  //   CategoryModel(name: "Home", percentage: "35%", color: AppColors.catHome),
-  //   CategoryModel(name: "Food", percentage: "25%", color: AppColors.catFood),
-  //   CategoryModel(name: "Transport", percentage: "15%", color: AppColors.catTransport),
-  //   CategoryModel(name: "Education", percentage: "15%", color: AppColors.catEducation),
-  //   CategoryModel(name: "Others", percentage: "10%", color: AppColors.catOthers),
-  // ];
+  String _getUserDisplayName() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user?.displayName != null && user!.displayName!.trim().isNotEmpty) {
+      return user.displayName!.trim();
+    } else if (user?.email != null && user!.email!.isNotEmpty) {
+      return user.email!.split('@')[0];
+    }
+    return 'User';
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final expenseProvider = Provider.of<ExpenseProvider>(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
       body: SafeArea(
@@ -57,10 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader() {
+    final String userName = _getUserDisplayName();
+    final String greeting = _getGreeting();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text("Good Morning, Sanya! 👋", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textMain)), SizedBox(height: 4), Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("$greeting, $userName! 👋", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textMain)), const SizedBox(height: 4), const Text("Here's your family overview", style: TextStyle(fontSize: 14, color: AppColors.textMuted))]),
         GestureDetector(
           onTap: () async {
             Provider.of<ExpenseProvider>(context, listen: false).clearData();
@@ -123,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSpendingOverview(ExpenseProvider provider) {
-    // Provider mathi dynamic category list (percentage sathe)
     final List<CategoryModel> categories = provider.categorySpendingList;
 
     return Column(
@@ -140,28 +154,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   : Row(
                     children: [
                       SizedBox(
-                        width: 130,
-                        height: 130,
+                        width: 120,
+                        height: 120,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             PieChart(
                               PieChartData(
                                 sectionsSpace: 2,
-                                centerSpaceRadius: 45,
+                                centerSpaceRadius: 40,
                                 sections:
                                     categories.map((cat) {
                                       return PieChartSectionData(color: cat.color, value: double.parse(cat.percentage.replaceAll('%', '')), title: '', radius: 12);
                                     }).toList(),
                               ),
                             ),
-                            Column(mainAxisSize: MainAxisSize.min, children: [Text("₹ ${provider.totalExpense.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textMain)), const Text("Total", style: TextStyle(color: AppColors.textMuted, fontSize: 11))]),
+                            Column(mainAxisSize: MainAxisSize.min, children: [Text("₹ ${provider.totalExpense.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textMain)), const Text("Total", style: TextStyle(color: AppColors.textMuted, fontSize: 11))]),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 24),
+                      const SizedBox(width: 16),
 
-                      // Dynamic Legend
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +182,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               categories.map((cat) {
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 10.0),
-                                  child: Row(children: [CircleAvatar(backgroundColor: cat.color, radius: 5), const SizedBox(width: 10), Expanded(child: Text(cat.name, style: const TextStyle(fontSize: 13, color: AppColors.textMuted))), Text(cat.percentage, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMain))]),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(backgroundColor: cat.color, radius: 4),
+                                      const SizedBox(width: 8),
+                                      Expanded(child: Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, softWrap: false, style: const TextStyle(fontSize: 13, color: AppColors.textMuted))),
+                                      const SizedBox(width: 6),
+                                      Text(cat.percentage, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textMain)),
+                                    ],
+                                  ),
                                 );
                               }).toList(),
                         ),
@@ -181,7 +202,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Home Screen: Today Expense
   Widget _buildRecentTransactions(ExpenseProvider provider) {
     final todayExpenses = provider.todayExpenseTransactions;
 

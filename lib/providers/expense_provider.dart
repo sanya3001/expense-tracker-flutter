@@ -70,15 +70,12 @@ class ExpenseProvider with ChangeNotifier {
   Future<void> initFamilyAndFetch(User user) async {
     try {
       final userEmail = (user.email ?? '').trim().toLowerCase();
-
       final inviteQuery = await _firestore.collection('family_members').where('email', isEqualTo: userEmail).limit(1).get();
-
       if (inviteQuery.docs.isNotEmpty) {
         _familyId = inviteQuery.docs.first.data()['familyId'];
       } else {
         _familyId = user.uid;
       }
-
       fetchTransactions();
     } catch (e) {
       debugPrint("Error finding familyId in expense provider: $e");
@@ -93,7 +90,6 @@ class ExpenseProvider with ChangeNotifier {
       notifyListeners();
       return;
     }
-
     _firestore
         .collection('transactions')
         .where('familyId', isEqualTo: _familyId)
@@ -101,7 +97,6 @@ class ExpenseProvider with ChangeNotifier {
         .listen(
           (snapshot) {
             _transactions = snapshot.docs.map((doc) => TransactionModel.fromMap(doc.data(), doc.id)).toList();
-
             _transactions.sort((a, b) => b.date.compareTo(a.date));
             notifyListeners();
           },
@@ -116,13 +111,10 @@ class ExpenseProvider with ChangeNotifier {
     if (_familyId == null && user != null) {
       await initFamilyAndFetch(user);
     }
-
     if (_familyId == null) return;
-
     try {
       final data = transaction.toMap();
       data['familyId'] = _familyId;
-
       await _firestore.collection('transactions').add(data);
     } catch (e) {
       debugPrint("Error saving transaction: $e");

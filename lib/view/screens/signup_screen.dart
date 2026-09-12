@@ -11,56 +11,37 @@ class SignupScreen extends StatefulWidget {
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
-// class _SignupScreenState extends State<SignupScreen> {
-//   final TextEditingController _nameController = TextEditingController();
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-//   final AuthService _authService = AuthService();
-//
-//   bool _obscurePassword = true;
-//   bool _isLoading = false;
-//
-//   void _handleSignup() async {
-//     setState(() => _isLoading = true);
-//     final user = await _authService.loginWithEmail(
-//       _emailController.text.trim(),
-//       _passwordController.text.trim(),
-//     );
-//     setState(() => _isLoading = false);
-//
-//     if (user != null && mounted) {
-//       // Ideally, update user profile with Name here
-//       Navigator.pushAndRemoveUntil(
-//         context,
-//         MaterialPageRoute(builder: (context) => const HomeScreen()),
-//             (Route<dynamic> route) => false,
-//       );
-//     } else {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text("Signup Failed. Please try again.")),
-//       );
-//     }
-//   }
-
 class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
-  final TextEditingController _nameController =
-  TextEditingController();
-
-  final TextEditingController _emailController =
-  TextEditingController();
-
-  final TextEditingController _passwordController =
-  TextEditingController();
-
-  //authservice object
   final AuthService _authService = AuthService();
 
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
-  // Create Account
   Future<void> _handleSignup() async {
+    final String name = _nameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+    final String confirmPassword = _confirmPasswordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -68,27 +49,22 @@ class _SignupScreenState extends State<SignupScreen> {
 
     try {
       final User? user = await _authService.createAccountWithEmail(
-        _emailController.text.trim(), //trim extra space ne remove kare
-        _passwordController.text.trim(),
+        name,
+        email,
+        password,
       );
 
-      //check kare user create thyo k nai and screen widget tree ma che k nai
       if (user != null && mounted) {
-        //user back no jai shake
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
               (route) => false,
         );
       }
     } on FirebaseAuthException catch (e) {
       String message = 'Account creation failed';
-
       if (e.code == 'email-already-in-use') {
-        message =
-        'An account already exists with this email';
+        message = 'An account already exists with this email';
       } else if (e.code == 'invalid-email') {
         message = 'Please enter a valid email address';
       } else if (e.code == 'weak-password') {
@@ -96,22 +72,11 @@ class _SignupScreenState extends State<SignupScreen> {
       }
 
       if (!mounted) return;
-
-      //temporary message batave
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Something went wrong. Please try again.',
-          ),
-        ),
+        const SnackBar(content: Text('Something went wrong. Please try again.')),
       );
     } finally {
       if (mounted) {
@@ -120,6 +85,15 @@ class _SignupScreenState extends State<SignupScreen> {
         });
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -153,7 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 "Sign up to start tracking expenses with your family.",
                 style: TextStyle(fontSize: 14, color: AppColors.textMuted),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
 
               // Full Name
               _buildTextField(
@@ -177,6 +151,19 @@ class _SignupScreenState extends State<SignupScreen> {
                 hintText: "Password",
                 icon: Icons.lock_outline,
                 isPassword: true,
+                obscureText: _obscurePassword,
+                onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
+              ),
+              const SizedBox(height: 16),
+
+              // Confirm Password Field
+              _buildTextField(
+                controller: _confirmPasswordController,
+                hintText: "Confirm Password",
+                icon: Icons.lock_outline,
+                isPassword: true,
+                obscureText: _obscureConfirmPassword,
+                onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
               ),
               const SizedBox(height: 30),
 
@@ -203,12 +190,13 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Same textfield widget as login
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
-    bool isPassword = false
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? onToggleVisibility,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -218,15 +206,19 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
       child: TextField(
         controller: controller,
-        obscureText: isPassword ? _obscurePassword : false,
+        obscureText: isPassword ? obscureText : false,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
           prefixIcon: Icon(icon, color: AppColors.textMuted, size: 20),
           suffixIcon: isPassword
               ? IconButton(
-            icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textMuted, size: 20),
-            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+            icon: Icon(
+              obscureText ? Icons.visibility_off : Icons.visibility,
+              color: AppColors.textMuted,
+              size: 20,
+            ),
+            onPressed: onToggleVisibility,
           )
               : null,
           border: InputBorder.none,

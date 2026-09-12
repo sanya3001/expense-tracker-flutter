@@ -31,22 +31,13 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final User? user = await _authService.loginWithEmail(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
+      final User? user = await _authService.loginWithEmail(_emailController.text.trim(), _passwordController.text.trim());
 
       if (user != null && mounted) {
-        // user object pass karine family data sync karvo
         await Provider.of<FamilyProvider>(context, listen: false).initFamily(user);
         await Provider.of<ExpenseProvider>(context, listen: false).initFamilyAndFetch(user);
-
         if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-        );
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen()), (route) => false);
       }
     } on FirebaseAuthException catch (e) {
       String message = 'Login failed';
@@ -63,17 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Something went wrong. Please try again.'),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Something went wrong. Please try again.')));
     } finally {
       if (mounted) {
         setState(() {
@@ -86,19 +71,12 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleGoogleLogin() async {
     setState(() => _isLoading = true);
     final user = await _authService.loginWithGoogle();
-
     if (user != null && mounted) {
-      // user object pass karine Google login ma b sync karvo
       await Provider.of<FamilyProvider>(context, listen: false).initFamily(user);
       await Provider.of<ExpenseProvider>(context, listen: false).initFamilyAndFetch(user);
-
       if (!mounted) return;
       setState(() => _isLoading = false);
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false,
-      );
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen()), (route) => false);
     } else {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -107,141 +85,59 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 4.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(width: double.infinity, height: 240, child: Image.asset('assets/images/home.png', fit: BoxFit.contain, errorBuilder: (context, error, stackTrace) => Container(height: 200, color: const Color(0xFFE0E0E0), child: const Center(child: Text("Illustration Placeholder"))))),
+              const SizedBox(height: 0),
+              const Text("Welcome Back!", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textMain)),
+              const SizedBox(height: 4),
+              const Text("Login to continue", style: TextStyle(fontSize: 14, color: AppColors.textMuted)),
               const SizedBox(height: 20),
-              Image.asset(
-                'assets/images/home.png',
-                height: 180,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 180,
-                  color: const Color(0xFFE0E0E0),
-                  child: const Center(child: Text("Illustration Placeholder")),
-                ),
-              ),
-              const SizedBox(height: 30),
-              const Text(
-                "Welcome Back!",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMain,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Login to continue",
-                style: TextStyle(fontSize: 14, color: AppColors.textMuted),
-              ),
-              const SizedBox(height: 30),
-
-              _buildTextField(
-                controller: _emailController,
-                hintText: "Email or Phone",
-                icon: Icons.email_outlined,
-              ),
+              _buildTextField(controller: _emailController, hintText: "Email or Phone", icon: Icons.email_outlined),
               const SizedBox(height: 16),
-
-              _buildTextField(
-                controller: _passwordController,
-                hintText: "Password",
-                icon: Icons.lock_outline,
-                isPassword: true,
-              ),
-              const SizedBox(height: 12),
-
+              _buildTextField(controller: _passwordController, hintText: "Password", icon: Icons.lock_outline, isPassword: true),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _rememberMe,
-                        onChanged: (val) => setState(() => _rememberMe = val!),
-                        activeColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                      ),
-                      const Text("Remember me", style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Forgot Password?",
-                      style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold),
-                    ),
-                  )
+                  Row(children: [Checkbox(value: _rememberMe, onChanged: (val) => setState(() => _rememberMe = val!), activeColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))), const Text("Remember me", style: TextStyle(fontSize: 12, color: AppColors.textMuted))]),
+                  TextButton(onPressed: () {}, child: const Text("Forgot Password?", style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold))),
                 ],
               ),
-              const SizedBox(height: 20),
-
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: AppColors.white)
-                      : const Text("Login", style: TextStyle(fontSize: 16, color: AppColors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0),
+                  child: _isLoading ? const CircularProgressIndicator(color: AppColors.white) : const Text("Login", style: TextStyle(fontSize: 16, color: AppColors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
+              const SizedBox(height: 20),
+              Row(children: const [Expanded(child: Divider(color: Color(0xFFE0E0E0), thickness: 1)), Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text("or continue with", style: TextStyle(fontSize: 12, color: AppColors.textMuted))), Expanded(child: Divider(color: Color(0xFFE0E0E0), thickness: 1))]),
+              const SizedBox(height: 18),
+              Row(children: [Expanded(child: _socialButton(iconPath: "assets/icons/google.png", fallbackIcon: Icons.g_mobiledata, onTap: _handleGoogleLogin)), const SizedBox(width: 16), Expanded(child: _socialButton(iconPath: "assets/icons/apple.png", fallbackIcon: Icons.apple, onTap: () {}))]),
               const SizedBox(height: 24),
-
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: Color(0xFFE0E0E0), thickness: 1)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text("or continue with", style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                  ),
-                  Expanded(child: Divider(color: Color(0xFFE0E0E0), thickness: 1)),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: _socialButton(
-                      iconPath: "assets/icons/google.png",
-                      fallbackIcon: Icons.g_mobiledata,
-                      onTap: _handleGoogleLogin,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _socialButton(
-                      iconPath: "assets/icons/apple.png",
-                      fallbackIcon: Icons.apple,
-                      onTap: () {},
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Don't have an account? ", style: TextStyle(fontSize: 14, color: AppColors.textMuted)),
-                  GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupScreen())),
-                    child: const Text("Sign Up", style: TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.bold)),
-                  ),
-                ],
+                children: [const Text("Don't have an account? ", style: TextStyle(fontSize: 14, color: AppColors.textMuted)), GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupScreen())), child: const Text("Sign Up", style: TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.bold)))],
               ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -249,18 +145,9 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    bool isPassword = false,
-  }) {
+  Widget _buildTextField({required TextEditingController controller, required String hintText, required IconData icon, bool isPassword = false}) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
-      ),
+      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE0E0E0))),
       child: TextField(
         controller: controller,
         obscureText: isPassword ? _obscurePassword : false,
@@ -268,12 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
           hintText: hintText,
           hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
           prefixIcon: Icon(icon, color: AppColors.textMuted, size: 20),
-          suffixIcon: isPassword
-              ? IconButton(
-            icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textMuted, size: 20),
-            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-          )
-              : null,
+          suffixIcon: isPassword ? IconButton(icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textMuted, size: 20), onPressed: () => setState(() => _obscurePassword = !_obscurePassword)) : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
@@ -282,20 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _socialButton({required String iconPath, required IconData fallbackIcon, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE0E0E0)),
-        ),
-        child: Center(
-          child: Icon(fallbackIcon, size: 30, color: AppColors.textMain),
-        ),
-      ),
-    );
+    return InkWell(onTap: onTap, borderRadius: BorderRadius.circular(12), child: Container(height: 50, decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE0E0E0))), child: Center(child: Icon(fallbackIcon, size: 30, color: AppColors.textMain))));
   }
 }

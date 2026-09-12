@@ -3,39 +3,28 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-
   bool _googleInitialized = false;
 
   // Email & Password Login
-  Future<User?> loginWithEmail(
-      String email,
-      String password,
-      ) async {
+  Future<User?> loginWithEmail(String email, String password) async {
     try {
-      final UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
+      final UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       return result.user;
     } on FirebaseAuthException {
       rethrow;
     }
   }
 
-  Future<User?> createAccountWithEmail(
-      String email,
-      String password,
-      ) async {
+  // Create Account with Name
+  Future<User?> createAccountWithEmail(String name, String email, String password) async {
     try {
-      final UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      return result.user;
+      final UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+      if (result.user != null && name.isNotEmpty) {
+        await result.user!.updateDisplayName(name);
+        await result.user!.reload();
+      }
+      return _firebaseAuth.currentUser;
     } on FirebaseAuthException {
       rethrow;
     }
@@ -44,32 +33,14 @@ class AuthService {
   // Google Login
   Future<User?> loginWithGoogle() async {
     try {
-      // Initialize Google Sign-In ek j var
       if (!_googleInitialized) {
-        //await _googleSignIn.initialize();
-        await _googleSignIn.initialize(
-          serverClientId: '96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com',
-        );
+        await _googleSignIn.initialize(serverClientId: '96198658949-vbmgeqhsjeirjdhrq0q0ece30j15at61.apps.googleusercontent.com');
         _googleInitialized = true;
       }
-
-      // Start Google sign-in
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
-
-      // Get Google authentication information
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-      // Create Firebase credential
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
-
-      // Sign in to Firebase
-      final UserCredential result =
-      await _firebaseAuth.signInWithCredential(
-        credential,
-      );
-
+      final AuthCredential credential = GoogleAuthProvider.credential(idToken: googleAuth.idToken);
+      final UserCredential result = await _firebaseAuth.signInWithCredential(credential);
       return result.user;
     } on FirebaseAuthException {
       rethrow;

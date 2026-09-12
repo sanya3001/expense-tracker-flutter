@@ -58,7 +58,6 @@ class FamilyProvider with ChangeNotifier {
           });
         }
       }
-
       fetchFamilyMembers();
     } catch (e) {
       debugPrint("Error initializing family: $e");
@@ -94,14 +93,11 @@ class FamilyProvider with ChangeNotifier {
     if (_familyId == null && user != null) {
       await initFamily(user);
     }
-
     if (_familyId == null) return;
-
     try {
       final data = member.toMap();
       data['familyId'] = _familyId;
-      data['email'] = member.email.trim().toLowerCase(); //
-
+      data['email'] = member.email.trim().toLowerCase();
       await _firestore.collection('family_members').add(data);
       debugPrint("Member added successfully with familyId: $_familyId");
     } catch (e) {
